@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Michael Wardlow / 001
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -105,6 +105,40 @@ public class Graph {
   public int findRoot() {
 
     // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
+
+    // An array to store the number of incoming edges for each vertex.
+    int[] inDegree = new int[numVertices];
+
+    // Loop through the adjacency list to calculate in-degrees.
+    for (int src = 0; src < numVertices; src++) {
+      for (int dest : adjListArr[src]) {
+      inDegree[dest]++;   // increment count since they have an edge coming into them.
+      }
+    }
+
+    // initialize a variable to track the index of the root
+    // If more than one vertex has in-degree 0, we will return -1
+    int rootIndex = -1;
+
+    // scan through all vertices to find those with in-degree 0.
+    for (int i = 0; i < numVertices; i++) {
+      if (inDegree[i] == 0) {
+        if (rootIndex == -1) {
+          // First vertex with in-degree 0 - possible root.
+          rootIndex = i;
+        } else {
+          // Found more than one vertex with in-degree 0 - not a single root.
+          return -1;
+        }
+      }
+    }
+
+    // After the loop, check if we found a root at all.
+    if (rootIndex == -1) {
+      // No vertex with in-degree 0 was found - no root exists.
+      return -1;
+    }
+
+    return vertexValues.get(rootIndex);   // Reutnr the value of the root vertex
   } 
 }

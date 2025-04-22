@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Michael Wardlow / 001
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -82,9 +82,54 @@ class ProblemSolutions {
                                         prerequisites); 
 
         // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
-        return false;
 
+        // Reverse the edges for topological sorting
+        ArrayList<Integer>[] reverseAdj = new ArrayList[numNodes];
+        for (int i = 0; i < numNodes; i++) {
+        reverseAdj[i] = new ArrayList<>();
     }
+
+    // Array keeps track of the # of prerequesites each exam has
+    int[] inDegree = new int[numNodes];
+
+    // Traverse the original adjacency list to build the reversed graph and the in-degree array
+    for (int a = 0; a < numNodes; a++) {
+        for (int b : adj[a]) {
+            // Reverse the edge: b → a
+            reverseAdj[b].add(a);
+            inDegree[a]++;      // Increment  its in-degree
+        }
+    }
+
+    // Queue to perform BFS for topological sorting
+    // Start topological sort with all nodes that have in-degree 0
+    Queue<Integer> queue = new LinkedList<>();
+    for (int i = 0; i < numNodes; i++) {
+        if (inDegree[i] == 0) {
+            queue.offer(i);
+        }
+    }
+
+    int count = 0;  // Count how many exams we are able to "finish"
+
+    while (!queue.isEmpty()) {
+        int current = queue.poll();     // Take an exam with no remaining prerequesites
+        count++;        // One moreexam successfully scheduled
+
+        // For each exam that depends on the current  one (via reverse graph)
+        for (int neighbor : reverseAdj[current]) {
+            inDegree[neighbor]--;       // Reduce the prerequisite count
+
+            // If the exam has no more prerequesits, it's ready to be taking
+            if (inDegree[neighbor] == 0) {
+                queue.offer(neighbor);
+            }
+        }
+    }
+
+    // If we processed all exams, there’s no cycle
+    return count == numNodes;
+}
 
 
     /**
@@ -192,7 +237,37 @@ class ProblemSolutions {
 
         // YOUR CODE GOES HERE - you can add helper methods, you do not need
         // to put all code in this method.
-        return -1;
+
+        // Create a boolean array to keep track of visited nodes during traversal
+        boolean[] visited = new boolean[numNodes];
+        int numGroups = 0;
+
+    // Iterate through each node in the graph
+    for (i = 0; i < numNodes; i++) {
+        if (!visited[i]) {          // If this node hasn't been visited, it's part of a new group
+            dfs(i, graph, visited);     // Perform a DFS starting from this node to visit all nodes in its group
+            numGroups++; // After DFS completes, we’ve explored one whole group
+        }
+    }
+
+    return numGroups;   // return total number of connected groups
+}
+
+// Helper method: DFS to mark all reachable nodes from 'node' as visited
+private void dfs(int node, Map<Integer, List<Integer>> graph, boolean[] visited) {
+    visited[node] = true;   // Current node as visited
+
+    // If the node has no connections in the graph, it's isolated and done
+    if (!graph.containsKey(node)) {
+        return;
+    }
+
+    // Visit all unvisited neighbors recursively
+    for (int neighbor : graph.get(node)) {
+        if (!visited[neighbor]) {
+            dfs(neighbor, graph, visited);
+        }
+    }
     }
 
 }
